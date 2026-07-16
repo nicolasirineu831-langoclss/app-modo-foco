@@ -963,19 +963,19 @@ function addExerciseToDay(day, muscle, exerciseId){
 }
 
 /* ---------------- Criar novo exercício ---------------- */
-function renderNewExercise(main, params){
-  const {day, muscle} = params;
-  setHeader('Novo exercício', muscle ? muscleInfo(muscle).label : 'Biblioteca');
+função  renderizarNovoExercício ( principal , parâmetros ) {
+  const  { dia , músculo } = parâmetros ;
+  setHeader ( 'Novo exercício' , muscle ? muscleInfo ( muscle ) . label : 'Biblioteca' ) ;
 
-  main.innerHTML = `
+  principal.innerHTML = `​​
     <div class="field">
       <label>Nome do exercício</label>
       <input type="text" id="newExName" placeholder="Ex: Supino declinado com halteres">
     </div>
     <div class="field">
-      <label>Músculo trabalhado</label>
+      <label>Músculo trabalho</label>
       <select id="newExMuscle">
-        ${MUSCLES.map(m=>`<option value="${m.key}" ${m.key===muscle?'selected':''}>${m.label}</option>`).join('')}
+        ${ MUSCLES . map ( m => `<option value=" ${ m . key } " ${ m . key === muscle ? 'selected' : '' } > ${ m . label } </option>` ) . join ( '' ) }
       </select>
     </div>
     <div class="field">
@@ -986,18 +986,18 @@ function renderNewExercise(main, params){
         <input type="file" id="newExVideo" accept="video/mp4,video/*,audio/mp3,audio/*">
       </div>
     </div>
-    <button class="btn btn-primary btn-block" onclick="saveNewExercise('${day||''}','${muscle||''}')">Salvar exercício</button>
+    <button class="btn btn-primary btn-block" onclick="saveNewExercise(' ${ day || '' } ',' ${ muscle || '' } ')">Salvar exercício</button>
     <button class="btn btn-secondary" onclick="goBack()">Cancelar</button>
-  `;
+  ` ;
 
-  document.getElementById('newExVideo').addEventListener('change', (e)=>{
-    const f = e.target.files[0];
-    document.getElementById('newExVideoName').textContent = f ? ('Selecionado: '+f.name) : '';
-  });
+  document.getElementById ( 'newExVideo' ) . addEventListener ( ' change' , ( e ) = > {
+    const  f = e . target . files [ 0 ] ;
+    documento . getElementById ( 'newExVideoName' ) . textContent = f ? ( ' Selecionado: ' + f.nome ) : ' ' ;
+  } ) ;
 }
-function saveNewExercise(day, muscle){
-  const name = document.getElementById('newExName').value.trim();
-  const selMuscle = document.getElementById('newExMuscle').value;
+função  salvarNovoExercício ( dia , músculo ) {
+  const  name = document.getElementById ( ' newExName ' ) . value.trim ( ) ;​​
+  const  selMuscle = document.getElementById ( ' newExMuscle ' ) . value ;
   const fileInput = document.getElementById('newExVideo');
   const file = fileInput.files[0];
 
