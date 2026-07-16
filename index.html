@@ -1,0 +1,1712 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>MODO FOCO — Treino & Dieta</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#14171A">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MODO FOCO">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="icon" href="./icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#14171A;
+  --surface:#1B1F23;
+  --surface-2:#23282D;
+  --surface-3:#2A3036;
+  --border:#2E353B;
+  --text:#F3F4F1;
+  --text-muted:#8F9AA1;
+  --text-faint:#5C666C;
+  --lime:#C8FF4D;
+  --lime-dim:#8FB83A;
+  --orange:#FF7A50;
+  --orange-dim:#C75B3B;
+  --danger:#FF5A5A;
+  --radius:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Inter',sans-serif;
+  overflow-x:hidden;
+}
+::selection{background:var(--lime);color:#0A0C0D;}
+button,input,select,textarea{font-family:inherit;}
+button{cursor:pointer;border:none;background:none;color:inherit;}
+a{color:inherit;text-decoration:none;}
+h1,h2,h3,.display{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:0.02em;}
+.mono{font-family:'JetBrains Mono',monospace;}
+
+#app{
+  max-width:520px;
+  margin:0 auto;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  background:var(--bg);
+  position:relative;
+}
+
+/* ---- Chalk stripe signature divider ---- */
+.chalk-divider{
+  height:6px;
+  width:100%;
+  background:repeating-linear-gradient(
+    -35deg,
+    var(--stripe-color,var(--lime)) 0px,
+    var(--stripe-color,var(--lime)) 8px,
+    transparent 8px,
+    transparent 16px
+  );
+  opacity:0.85;
+}
+.theme-diet .chalk-divider{--stripe-color:var(--orange);}
+
+/* ---- Header ---- */
+header.topbar{
+  position:sticky;top:0;z-index:50;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+}
+.topbar-inner{
+  display:flex;align-items:center;gap:10px;
+  padding:14px 16px;
+}
+.back-btn{
+  width:38px;height:38px;border-radius:10px;
+  background:var(--surface-2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
+  transition:background .15s;
+}
+.back-btn:active{background:var(--surface-3);}
+.topbar-title{
+  font-size:20px;font-weight:600;flex:1;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.topbar-sub{
+  font-family:'Inter',sans-serif;
+  text-transform:none;letter-spacing:0;
+  font-size:12px;color:var(--text-muted);
+  display:block;margin-top:1px;
+}
+
+/* ---- Main content ---- */
+main{
+  flex:1;
+  padding:18px 16px 100px 16px;
+  animation:fadeIn .22s ease;
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+/* ---- Bottom nav ---- */
+nav.bottomnav{
+  position:sticky;bottom:0;z-index:50;
+  background:var(--surface);
+  border-top:1px solid var(--border);
+  display:flex;
+  padding:8px 6px calc(8px + env(safe-area-inset-bottom,0px)) 6px;
+}
+.nav-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:8px 4px;border-radius:12px;
+  color:var(--text-faint);font-size:11px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.04em;
+  font-family:'Oswald',sans-serif;
+  transition:color .15s, background .15s;
+}
+.nav-btn .ic{font-size:20px;}
+.nav-btn.active{color:var(--text);background:var(--surface-2);}
+.nav-btn.active.tab-treino{color:var(--lime);}
+.nav-btn.active.tab-dieta{color:var(--orange);}
+
+/* ---- Cards / generic ---- */
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:16px;
+  margin-bottom:12px;
+}
+.card-tap{transition:transform .1s, border-color .15s;}
+.card-tap:active{transform:scale(0.98);}
+.section-label{
+  font-size:12px;color:var(--text-muted);
+  text-transform:uppercase;letter-spacing:.08em;
+  margin:22px 0 10px 0;font-weight:600;
+}
+.section-label:first-child{margin-top:0;}
+.empty-state{
+  text-align:center;padding:36px 18px;color:var(--text-muted);
+  border:1.5px dashed var(--border);border-radius:var(--radius);
+}
+.empty-state .em-title{color:var(--text);font-weight:600;margin-bottom:4px;}
+.empty-state .em-sub{font-size:13px;line-height:1.5;}
+
+/* ---- Buttons ---- */
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:14px 18px;border-radius:12px;
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:15px;
+  text-transform:uppercase;letter-spacing:.03em;
+  transition:transform .1s, opacity .15s;
+  width:100%;
+}
+.btn:active{transform:scale(0.97);}
+.btn-primary{background:var(--lime);color:#0A0C0D;}
+.theme-diet .btn-primary{background:var(--orange);color:#1A0A05;}
+.btn-secondary{background:var(--surface-2);color:var(--text);border:1px solid var(--border);}
+.btn-danger{background:rgba(255,90,90,.12);color:var(--danger);border:1px solid rgba(255,90,90,.35);}
+.btn-ghost{background:transparent;color:var(--text-muted);border:1px solid var(--border);}
+.btn-block{margin-bottom:10px;}
+.btn-sm{padding:9px 14px;font-size:12px;width:auto;}
+.fab{
+  position:fixed;bottom:88px;right:calc(50% - 260px + 18px);
+  width:56px;height:56px;border-radius:50%;
+  background:var(--lime);color:#0A0C0D;
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;font-weight:700;
+  box-shadow:0 6px 18px rgba(0,0,0,.4);
+  z-index:40;
+}
+.theme-diet .fab{background:var(--orange);color:#1A0A05;}
+@media (max-width:560px){
+  .fab{right:20px;}
+}
+
+/* ---- Day pills (plate style) ---- */
+.day-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:10px;}
+.day-plate{
+  aspect-ratio:1;border-radius:50%;
+  background:var(--surface);
+  border:2px solid var(--border);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;position:relative;
+  transition:border-color .15s, transform .1s;
+}
+.day-plate:active{transform:scale(0.95);}
+.day-plate .dow{font-family:'Oswald',sans-serif;font-weight:700;font-size:15px;text-transform:uppercase;}
+.day-plate .cnt{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);}
+.day-plate.has-data{border-color:var(--lime);}
+.theme-diet .day-plate.has-data{border-color:var(--orange);}
+
+/* ---- Muscle badge ---- */
+.badge{
+  width:40px;height:40px;border-radius:10px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:13px;
+  color:#0A0C0D;
+}
+.row{display:flex;align-items:center;gap:12px;}
+.row-between{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.flex1{flex:1;min-width:0;}
+.title-sm{font-weight:600;font-size:15px;}
+.sub-xs{font-size:12px;color:var(--text-muted);margin-top:2px;}
+.chip{
+  display:inline-flex;align-items:center;padding:4px 10px;border-radius:100px;
+  font-size:11px;font-weight:600;background:var(--surface-2);color:var(--text-muted);
+  border:1px solid var(--border);
+}
+
+/* ---- Forms ---- */
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:7px;text-transform:uppercase;letter-spacing:.04em;}
+.field input[type=text],.field input[type=number],.field input[type=time],.field select,.field textarea{
+  width:100%;padding:13px 14px;border-radius:10px;
+  background:var(--surface-2);border:1px solid var(--border);
+  color:var(--text);font-size:15px;
+}
+.field input:focus,.field select:focus,.field textarea:focus{outline:2px solid var(--lime);outline-offset:0;border-color:transparent;}
+.theme-diet .field input:focus,.theme-diet .field select:focus{outline-color:var(--orange);}
+.field-file{
+  border:1.5px dashed var(--border);border-radius:10px;padding:16px;text-align:center;
+  background:var(--surface-2);
+}
+.field-file input{display:none;}
+.field-file .fl-label{font-size:13px;color:var(--text-muted);}
+.field-file .fl-name{color:var(--lime);font-size:13px;margin-top:6px;word-break:break-all;}
+.theme-diet .field-file .fl-name{color:var(--orange);}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.seg{display:flex;border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.seg button{flex:1;padding:11px 6px;font-size:12px;font-weight:600;background:var(--surface-2);color:var(--text-muted);}
+.seg button.active{background:var(--lime);color:#0A0C0D;}
+.theme-diet .seg button.active{background:var(--orange);color:#1A0A05;}
+
+/* ---- List item with action ---- */
+.list-item{
+  display:flex;align-items:center;gap:12px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:12px;margin-bottom:10px;
+}
+.icon-btn{
+  width:34px;height:34px;border-radius:9px;background:var(--surface-2);
+  display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;
+}
+.icon-btn:active{background:var(--surface-3);}
+.icon-btn.danger{color:var(--danger);}
+
+video,audio{width:100%;border-radius:10px;background:#000;display:block;}
+
+.macro-bar{display:flex;height:8px;border-radius:6px;overflow:hidden;background:var(--surface-2);margin-top:8px;}
+.macro-bar span{height:100%;}
+
+.toast{
+  position:fixed;left:50%;bottom:100px;transform:translateX(-50%);
+  background:var(--surface-3);border:1px solid var(--border);
+  padding:12px 18px;border-radius:100px;font-size:13px;font-weight:600;
+  z-index:99;opacity:0;pointer-events:none;transition:opacity .25s, transform .25s;
+  max-width:88%;text-align:center;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(-6px);}
+
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(10,12,13,.7);
+  display:flex;align-items:flex-end;justify-content:center;z-index:90;
+  animation:fadeIn .15s ease;
+}
+.modal-sheet{
+  width:100%;max-width:520px;background:var(--surface);
+  border-radius:20px 20px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom,0px)) 18px;
+  max-height:82vh;overflow-y:auto;
+  border-top:1px solid var(--border);
+}
+.modal-handle{width:40px;height:4px;background:var(--border);border-radius:4px;margin:0 auto 16px auto;}
+.modal-title{font-size:18px;font-weight:600;margin-bottom:16px;}
+
+.hint-box{
+  background:var(--surface-2);border-left:3px solid var(--lime);
+  border-radius:8px;padding:12px 14px;font-size:12.5px;color:var(--text-muted);line-height:1.55;margin-bottom:16px;
+}
+.theme-diet .hint-box{border-left-color:var(--orange);}
+
+::-webkit-scrollbar{width:0;height:0;}
+.app-footer{
+  margin-top:40px;
+  padding:24px 4px 8px 4px;
+  text-align:center;
+  border-top:1px solid var(--border);
+}
+.app-footer p{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  color:var(--text-faint);
+  letter-spacing:.04em;
+}
+#authScreen{
+  position:fixed;inset:0;background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;z-index:200;overflow-y:auto;
+}
+.auth-wrap{width:100%;max-width:380px;}
+.auth-logo{
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:34px;
+  letter-spacing:.03em;color:var(--lime);text-align:center;
+}
+.auth-sub{
+  text-align:center;color:var(--text-muted);font-size:13px;
+  text-transform:uppercase;letter-spacing:.08em;margin-top:2px;
+}
+.auth-error{
+  color:var(--danger);font-size:13px;margin:-6px 0 14px 0;
+  min-height:16px;
+}
+</style>
+</head>
+<body>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+	<div id="authScreen">
+  <div class="auth-wrap">
+    <div class="auth-logo">MODO FOCO</div>
+    <div class="auth-sub">Treino & Dieta</div>
+
+    <div class="seg" style="margin:24px 0 20px 0;">
+      <button type="button" id="tabLoginBtn" class="active" onclick="showAuthTab('login')">Entrar</button>
+      <button type="button" id="tabSignupBtn" onclick="showAuthTab('signup')">Criar conta</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="loginForm">
+      <div class="field">
+        <label>E-mail</label>
+        <input type="email" id="loginEmail" placeholder="seuemail@exemplo.com">
+      </div>
+      <div class="field">
+        <label>Senha</label>
+        <input type="password" id="loginSenha" placeholder="Sua senha">
+      </div>
+      <div id="loginError" class="auth-error"></div>
+      <button class="btn btn-primary btn-block" onclick="doLogin()">Entrar</button>
+    </div>
+
+    <!-- CADASTRO -->
+    <div id="signupForm" style="display:none;">
+      <div class="field">
+        <label>Nome</label>
+        <input type="text" id="suNome" placeholder="Seu nome completo">
+      </div>
+      <div class="field">
+        <label>E-mail</label>
+        <input type="email" id="suEmail" placeholder="seuemail@exemplo.com">
+      </div>
+      <div class="field">
+        <label>Telefone</label>
+        <input type="text" id="suTelefone" placeholder="(00) 00000-0000">
+      </div>
+      <div class="field">
+        <label>Data de nascimento</label>
+        <input type="date" id="suNascimento">
+      </div>
+      <div class="field">
+        <label>Criar senha</label>
+        <input type="password" id="suSenha" placeholder="Mínimo 6 caracteres">
+      </div>
+      <div class="field">
+        <label>Confirmar senha</label>
+        <input type="password" id="suSenha2" placeholder="Repita a senha">
+      </div>
+      <div id="signupError" class="auth-error"></div>
+      <button class="btn btn-primary btn-block" onclick="doSignup()">Criar conta</button>
+    </div>
+  </div>
+	</div>
+	
+<div id="app">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <button class="back-btn" id="backBtn" onclick="goBack()" style="display:none;">←</button>
+      <div class="flex1">
+        <div class="topbar-title" id="pageTitle">MODO FOCO</div>
+        <span class="topbar-sub" id="pageSub"></span>
+      </div>
+      <button class="icon-btn" id="notifBtn" onclick="toggleNotifPanel()" title="Notificações" style="display:none;">🔔</button>
+    </div>
+    <div class="chalk-divider"></div>
+  </header>
+
+  <main id="main">
+    <div id="pageContent"></div>
+    <footer class="app-footer">
+      <p>MODO FOCO © 2026 — Treino & Dieta</p>
+			<p>© 2026 Nicolas Almeida. Todos os direitos reservados.</p>
+    </footer>
+	</main>
+
+  <button class="fab" id="fabBtn" style="display:none;">+</button>
+
+  <nav class="bottomnav">
+    <button class="nav-btn tab-home" data-tab="home" onclick="navigate('home')">
+      <span class="ic">⌂</span>Início
+    </button>
+    <button class="nav-btn tab-treino" data-tab="workout" onclick="navigate('workout-week')">
+      <span class="ic">🏋</span>Treino
+    </button>
+    <button class="nav-btn tab-dieta" data-tab="diet" onclick="navigate('diet-week')">
+      <span class="ic">🍽</span>Dieta
+    </button>
+  </nav>
+</div>
+
+<div id="modalRoot"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================================
+   MODO FOCO — App de Treino & Dieta
+   Armazenamento: em memória (dura enquanto a aba está aberta).
+   Use "Início > Backup" para exportar/importar seus dados em um arquivo .json
+   e não perder nada entre uma sessão e outra.
+   ========================================================================= */
+
+/* ---------------- Dados base ---------------- */
+const DAYS = [
+  {key:'dom', label:'Domingo', short:'DOM'},
+  {key:'seg', label:'Segunda-feira', short:'SEG'},
+  {key:'ter', label:'Terça-feira', short:'TER'},
+  {key:'qua', label:'Quarta-feira', short:'QUA'},
+  {key:'qui', label:'Quinta-feira', short:'QUI'},
+  {key:'sex', label:'Sexta-feira', short:'SEX'},
+  {key:'sab', label:'Sábado', short:'SAB'},
+];
+
+const MUSCLES = [
+  {key:'peito', label:'Peito', color:'#FF7A50'},
+  {key:'costas', label:'Costas', color:'#4DA1FF'},
+  {key:'quadriceps', label:'Quadríceps', color:'#C8FF4D'},
+  {key:'posterior', label:'Posterior de Coxa', color:'#9E7BFF'},
+  {key:'panturrilha', label:'Panturrilha', color:'#FFD24D'},
+  {key:'gluteos', label:'Glúteos', color:'#FF6FA3'},
+  {key:'ombro', label:'Ombro', color:'#4DFFE0'},
+  {key:'biceps', label:'Bíceps', color:'#FF9A4D'},
+  {key:'triceps', label:'Tríceps', color:'#4DFF88'},
+  {key:'antebraco', label:'Antebraço', color:'#C4C4C4'},
+  {key:'abdomen', label:'Abdômen', color:'#FFE14D'},
+  {key:'cardio', label:'Cardio', color:'#FF4D6A'},
+];
+function muscleInfo(key){return MUSCLES.find(m=>m.key===key) || {key, label:key, color:'#888'};}
+
+const FOOD_CATEGORIES = [
+  {key:'proteina', label:'Proteína', color:'#FF7A50'},
+  {key:'carboidrato', label:'Carboidrato', color:'#C8FF4D'},
+  {key:'gordura', label:'Gordura', color:'#FFD24D'},
+  {key:'vegetal', label:'Vegetal', color:'#4DFF88'},
+  {key:'fruta', label:'Fruta', color:'#FF6FA3'},
+  {key:'laticinio', label:'Laticínio', color:'#4DA1FF'},
+  {key:'outro', label:'Outro', color:'#C4C4C4'},
+];
+function catInfo(key){return FOOD_CATEGORIES.find(c=>c.key===key) || {key, label:key, color:'#888'};}
+
+/* Biblioteca inicial de exercícios (sem vídeo — usuário pode anexar o dele) */
+function seedExercises(){
+  const presets = {
+    peito:['Supino reto com barra','Supino inclinado com halteres','Crucifixo reto','Crossover na polia','Flexão de braço','Peck deck'],
+    costas:['Puxada frente (pulley)','Remada curvada com barra','Remada baixa (cabo)','Barra fixa','Levantamento terra','Remada unilateral com halter'],
+    quadriceps:['Agachamento livre','Leg press 45°','Cadeira extensora','Avanço (afundo)','Agachamento búlgaro'],
+    posterior:['Mesa flexora','Stiff com barra','Cadeira flexora','Levantamento terra romeno'],
+    panturrilha:['Panturrilha em pé','Panturrilha sentado','Panturrilha no leg press'],
+    gluteos:['Elevação pélvica (hip thrust)','Cadeira abdutora','Agachamento sumô','Coice no cabo'],
+    ombro:['Desenvolvimento com halteres','Elevação lateral','Elevação frontal','Remada alta','Desenvolvimento Arnold'],
+    biceps:['Rosca direta com barra','Rosca alternada com halteres','Rosca scott','Rosca martelo'],
+    triceps:['Tríceps pulley (corda)','Tríceps testa','Mergulho no banco','Tríceps francês'],
+    antebraco:['Rosca de punho','Flexão de punho invertida','Farmer walk'],
+    abdomen:['Abdominal reto','Prancha isométrica','Elevação de pernas','Abdominal oblíquo'],
+    cardio:['Esteira (corrida/caminhada)','Bicicleta ergométrica','Pular corda','HIIT em circuito'],
+  };
+  const list = [];
+  Object.keys(presets).forEach(muscle=>{
+    presets[muscle].forEach(name=>{
+      list.push({id:uid(), name, muscle, videoUrl:null, videoKind:null, custom:false});
+    });
+  });
+  return list;
+}
+
+function seedFoods(){
+  // valores aproximados por 100g
+  return [
+    {id:uid(), name:'Peito de frango grelhado', category:'proteina', protein:31, carbs:0, fat:3.6, custom:false},
+    {id:uid(), name:'Arroz branco cozido', category:'carboidrato', protein:2.7, carbs:28, fat:0.3, custom:false},
+    {id:uid(), name:'Feijão cozido', category:'carboidrato', protein:8.7, carbs:14, fat:0.5, custom:false},
+    {id:uid(), name:'Batata doce cozida', category:'carboidrato', protein:1.6, carbs:20, fat:0.1, custom:false},
+    {id:uid(), name:'Ovo cozido', category:'proteina', protein:13, carbs:1.1, fat:11, custom:false},
+    {id:uid(), name:'Brócolis cozido', category:'vegetal', protein:2.8, carbs:7, fat:0.4, custom:false},
+    {id:uid(), name:'Aveia em flocos', category:'carboidrato', protein:13.5, carbs:67, fat:7, custom:false},
+    {id:uid(), name:'Azeite de oliva', category:'gordura', protein:0, carbs:0, fat:100, custom:false},
+    {id:uid(), name:'Banana', category:'fruta', protein:1.1, carbs:23, fat:0.3, custom:false},
+    {id:uid(), name:'Atum em água (lata)', category:'proteina', protein:26, carbs:0, fat:1, custom:false},
+    {id:uid(), name:'Iogurte natural desnatado', category:'laticinio', protein:4.5, carbs:5, fat:0.2, custom:false},
+    {id:uid(), name:'Amêndoas', category:'gordura', protein:21, carbs:22, fat:49, custom:false},
+    {id:uid(), name:'Whey protein (pó)', category:'proteina', protein:80, carbs:8, fat:6, custom:false},
+    {id:uid(), name:'Pão integral', category:'carboidrato', protein:9, carbs:41, fat:4, custom:false},
+    {id:uid(), name:'Queijo cottage', category:'laticinio', protein:11, carbs:3.4, fat:4.3, custom:false},
+  ];
+}
+
+const MEAL_PRESETS = ['Café da manhã','Lanche da manhã','Almoço','Lanche da tarde','Jantar','Ceia'];
+
+/* ---------------- Estado em memória ---------------- */
+function emptyWeek(){
+  const w = {};
+  DAYS.forEach(d=>w[d.key]={muscles:[]}); // muscles: [{muscle, exercises:[{id, exerciseId}]}]
+  return w;
+}
+function emptyDietWeek(){
+  const w = {};
+  DAYS.forEach(d=>w[d.key]={meals:[]}); // meals: [{id, name, time, notify, foods:[{id, foodId, name, grams, protein, carbs, fat, category}]}]
+  return w;
+}
+
+const state = {
+  workoutWeek: emptyWeek(),
+  dietWeek: emptyDietWeek(),
+  exerciseLibrary: seedExercises(),
+  foodLibrary: seedFoods(),
+  notifPermission: (typeof Notification!=='undefined') ? Notification.permission : 'unsupported',
+  firedThisMinute: {}, // evita repetir notificação no mesmo minuto
+};
+
+function uid(){return 'id'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);}
+
+/* ---------------- Router ---------------- */
+let navStack = [{page:'home', params:{}}];
+function current(){return navStack[navStack.length-1];}
+
+function navigate(page, params={}, replace=false){
+  if(replace){ navStack[navStack.length-1] = {page, params}; }
+  else{ navStack.push({page, params}); }
+  render();
+  window.scrollTo(0,0);
+}
+function goBack(){
+  if(navStack.length>1){ navStack.pop(); render(); window.scrollTo(0,0); }
+  else{ navigate('home', {}, true); }
+}
+function goHomeTab(tabRoot){
+  navStack = [{page:tabRoot, params:{}}];
+  render();
+}
+
+/* ---------------- Toast ---------------- */
+let toastTimer=null;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* ---------------- Modal helper ---------------- */
+function openModal(html){
+  const root = document.getElementById('modalRoot');
+  root.innerHTML = `<div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      ${html}
+    </div>
+  </div>`;
+}
+function closeModal(){document.getElementById('modalRoot').innerHTML='';}
+
+/* ---------------- Confirm dialog ---------------- */
+function confirmAction(title, msg, onYes){
+  openModal(`
+    <div class="modal-title">${title}</div>
+    <p style="color:var(--text-muted);font-size:14px;line-height:1.5;margin-bottom:20px;">${msg}</p>
+    <button class="btn btn-danger btn-block" id="confirmYes">Confirmar</button>
+    <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+  `);
+  document.getElementById('confirmYes').onclick = ()=>{ closeModal(); onYes(); };
+}
+
+/* =========================================================================
+   RENDER PRINCIPAL
+   ========================================================================= */
+function render(){
+  const {page, params} = current();
+  const main = document.getElementById('pageContent');
+  const app = document.getElementById('app');
+  const backBtn = document.getElementById('backBtn');
+  const fab = document.getElementById('fabBtn');
+  fab.style.display='none';
+  fab.onclick=null;
+	saveToStorage();
+  backBtn.style.display = navStack.length>1 ? 'flex' : 'none';
+
+  // tema
+  app.classList.toggle('theme-diet', page.startsWith('diet'));
+
+  // nav ativa
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  if(page==='home') setNavActive('home');
+  else if(page.startsWith('workout')) setNavActive('workout');
+  else if(page.startsWith('diet')) setNavActive('diet');
+
+  const routes = {
+    'home': renderHome,
+    'backup': renderBackup,
+    'workout-week': renderWorkoutWeek,
+    'workout-day': renderWorkoutDay,
+    'workout-add-muscle': renderAddMuscle,
+    'workout-muscle': renderMuscleExercises,
+    'workout-pick-exercise': renderPickExercise,
+    'workout-new-exercise': renderNewExercise,
+    'workout-exercise-detail': renderExerciseDetail,
+    'library': renderLibrary,
+    'diet-week': renderDietWeek,
+    'diet-day': renderDietDay,
+    'diet-add-meal': renderAddMeal,
+    'diet-meal': renderMealDetail,
+    'diet-add-food': renderAddFood,
+    'diet-food-detail': renderFoodDetail,
+    'food-library': renderFoodLibrary,
+    'notif-settings': renderNotifSettings,
+  };
+  (routes[page] || renderHome)(main, params);
+}
+function setNavActive(tab){
+  const map = {home:'.tab-home', workout:'.tab-treino', diet:'.tab-dieta'};
+  const el = document.querySelector(map[tab]);
+  if(el) el.classList.add('active');
+}
+function setHeader(title, sub=''){
+  document.getElementById('pageTitle').textContent = title;
+  document.getElementById('pageSub').textContent = sub;
+}
+
+/* =========================================================================
+   HOME
+   ========================================================================= */
+function renderHome(main){
+  setHeader('MODO FOCO','Treino & Dieta');
+  document.getElementById('notifBtn').style.display='flex';
+
+  const workoutDaysFilled = DAYS.filter(d=>state.workoutWeek[d.key].muscles.length>0).length;
+  const dietMealsCount = DAYS.reduce((acc,d)=>acc+state.dietWeek[d.key].meals.length,0);
+
+  main.innerHTML = `
+    <div class="hint-box">
+      Seus dados ficam salvos enquanto esta aba estiver aberta. Antes de fechar, use <b>Backup</b> para exportar um arquivo e não perder nada.
+    </div>
+
+    <div class="section-label">Visão geral</div>
+    <div class="grid2">
+      <div class="card">
+        <div class="sub-xs">Dias com treino</div>
+        <div class="display" style="font-size:30px;color:var(--lime);">${workoutDaysFilled}<span style="font-size:16px;color:var(--text-muted);">/7</span></div>
+      </div>
+      <div class="card">
+        <div class="sub-xs">Refeições planejadas</div>
+        <div class="display" style="font-size:30px;color:var(--orange);">${dietMealsCount}</div>
+      </div>
+    </div>
+
+    <div class="section-label">Ir para</div>
+    <div class="card card-tap" onclick="navigate('workout-week')">
+      <div class="row">
+        <div class="badge" style="background:var(--lime);">🏋</div>
+        <div class="flex1">
+          <div class="title-sm">Treino da semana</div>
+          <div class="sub-xs">Organize exercícios por dia e grupo muscular</div>
+        </div>
+        <div style="color:var(--text-faint);">›</div>
+      </div>
+    </div>
+    <div class="card card-tap" onclick="navigate('diet-week')">
+      <div class="row">
+        <div class="badge" style="background:var(--orange);">🍽</div>
+        <div class="flex1">
+          <div class="title-sm">Dieta da semana</div>
+          <div class="sub-xs">Monte refeições e horários com lembrete</div>
+        </div>
+        <div style="color:var(--text-faint);">›</div>
+      </div>
+    </div>
+    <div class="card card-tap" onclick="navigate('library')">
+      <div class="row">
+        <div class="badge" style="background:var(--surface-3);color:var(--text);">📚</div>
+        <div class="flex1">
+          <div class="title-sm">Biblioteca de exercícios</div>
+          <div class="sub-xs">${state.exerciseLibrary.length} exercícios cadastrados</div>
+        </div>
+        <div style="color:var(--text-faint);">›</div>
+      </div>
+    </div>
+    <div class="card card-tap" onclick="navigate('food-library')">
+      <div class="row">
+        <div class="badge" style="background:var(--surface-3);color:var(--text);">🥗</div>
+        <div class="flex1">
+          <div class="title-sm">Biblioteca de alimentos</div>
+          <div class="sub-xs">${state.foodLibrary.length} alimentos cadastrados</div>
+        </div>
+        <div style="color:var(--text-faint);">›</div>
+      </div>
+    </div>
+    <div class="card card-tap" onclick="navigate('backup')">
+      <div class="row">
+        <div class="badge" style="background:var(--surface-3);color:var(--text);">💾</div>
+        <div class="flex1">
+          <div class="title-sm">Backup dos dados</div>
+          <div class="sub-xs">Exportar ou importar seu progresso</div>
+        </div>
+        <div style="color:var(--text-faint);">›</div>
+      </div>
+    </div>
+		<button class="btn btn-danger btn-block" style="margin-top:8px;" onclick="confirmAction('Sair da conta','Seus dados continuam salvos. Você pode entrar novamente com seu e-mail e senha.', logout)">Sair</button>
+  `;
+}
+
+/* =========================================================================
+   BACKUP (export/import JSON) — compensa a ausência de storage permanente
+   ========================================================================= */
+function renderBackup(main){
+  setHeader('Backup','Exportar / importar dados');
+  main.innerHTML = `
+    <div class="hint-box">Isso salva treino, dieta e suas bibliotecas personalizadas em um arquivo .json no seu dispositivo. Vídeos anexados localmente não são incluídos no arquivo (só o link fica ativo durante a sessão).</div>
+    <button class="btn btn-primary btn-block" onclick="exportData()">⬇ Exportar dados (.json)</button>
+    <div class="field-file" style="margin-bottom:16px;" onclick="document.getElementById('importInput').click()">
+      <div class="fl-label">⬆ Toque para importar um arquivo .json</div>
+      <input type="file" id="importInput" accept="application/json" onchange="importData(event)">
+    </div>
+    <button class="btn btn-danger" onclick="confirmAction('Apagar tudo','Isso vai limpar todo o treino e dieta cadastrados nesta sessão. Essa ação não pode ser desfeita.', resetAll)">Apagar todos os dados</button>
+  `;
+}
+function exportData(){
+  const data = {
+    workoutWeek: state.workoutWeek,
+    dietWeek: state.dietWeek,
+    exerciseLibrary: state.exerciseLibrary.map(e=>({...e, videoUrl:null})),
+    foodLibrary: state.foodLibrary,
+  };
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'modofoco-backup.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  showToast('Backup exportado!');
+}
+function importData(evt){
+  const file = evt.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    try{
+      const data = JSON.parse(reader.result);
+      if(data.workoutWeek) state.workoutWeek = data.workoutWeek;
+      if(data.dietWeek) state.dietWeek = data.dietWeek;
+      if(data.exerciseLibrary) state.exerciseLibrary = data.exerciseLibrary;
+      if(data.foodLibrary) state.foodLibrary = data.foodLibrary;
+      showToast('Dados importados com sucesso!');
+      navigate('home', {}, true);
+    }catch(e){
+      showToast('Arquivo inválido. Tente outro backup.');
+    }
+  };
+  reader.readAsText(file);
+}
+function resetAll(){
+  state.workoutWeek = emptyWeek();
+  state.dietWeek = emptyDietWeek();
+  showToast('Todos os dados foram apagados.');
+  navigate('home', {}, true);
+}
+
+/* =========================================================================
+   TREINO — Semana
+   ========================================================================= */
+function renderWorkoutWeek(main){
+  setHeader('Treino','Escolha um dia da semana');
+  document.getElementById('notifBtn').style.display='none';
+  main.innerHTML = `
+    <div class="day-grid">
+      ${DAYS.map(d=>{
+        const data = state.workoutWeek[d.key];
+        const total = data.muscles.reduce((a,m)=>a+m.exercises.length,0);
+        return `<button class="day-plate ${total>0?'has-data':''}" onclick="navigate('workout-day',{day:'${d.key}'})">
+          <span class="dow">${d.short}</span>
+          <span class="cnt">${total>0? total+' ex.' : '—'}</span>
+        </button>`;
+      }).join('')}
+    </div>
+    <div class="section-label">Resumo</div>
+    ${DAYS.filter(d=>state.workoutWeek[d.key].muscles.length>0).map(d=>{
+      const data = state.workoutWeek[d.key];
+      return `<div class="card card-tap" onclick="navigate('workout-day',{day:'${d.key}'})">
+        <div class="row-between">
+          <div class="title-sm">${d.label}</div>
+          <div style="color:var(--text-faint);">›</div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;">
+          ${data.muscles.map(m=>`<span class="chip">${muscleInfo(m.muscle).label} · ${m.exercises.length}</span>`).join('')}
+        </div>
+      </div>`;
+    }).join('') || `<div class="empty-state"><div class="em-title">Nenhum treino ainda</div><div class="em-sub">Toque em um dia acima para começar a montar sua semana.</div></div>`}
+  `;
+}
+
+/* ---------------- Dia de treino ---------------- */
+function renderWorkoutDay(main, params){
+  const day = DAYS.find(d=>d.key===params.day) || DAYS[0];
+  const data = state.workoutWeek[day.key];
+  setHeader(day.label, 'Grupos musculares do dia');
+
+  const fab = document.getElementById('fabBtn');
+  fab.style.display='flex';
+  fab.onclick = ()=>navigate('workout-add-muscle',{day:day.key});
+
+  main.innerHTML = `
+    ${data.muscles.length===0 ? `
+      <div class="empty-state">
+        <div class="em-title">Dia livre</div>
+        <div class="em-sub">Toque no botão + para adicionar um grupo muscular a este dia.</div>
+      </div>
+    ` : data.muscles.map(m=>{
+      const info = muscleInfo(m.muscle);
+      return `<div class="list-item card-tap" onclick="navigate('workout-muscle',{day:'${day.key}',muscle:'${m.muscle}'})">
+        <div class="badge" style="background:${info.color};">${info.label.slice(0,2).toUpperCase()}</div>
+        <div class="flex1">
+          <div class="title-sm">${info.label}</div>
+          <div class="sub-xs">${m.exercises.length} exercício${m.exercises.length===1?'':'s'}</div>
+        </div>
+        <button class="icon-btn danger" onclick="event.stopPropagation();removeMuscleFromDay('${day.key}','${m.muscle}')">✕</button>
+      </div>`;
+    }).join('')}
+    <button class="btn btn-secondary btn-block" style="margin-top:8px;" onclick="navigate('workout-add-muscle',{day:'${day.key}'})">+ Adicionar grupo muscular</button>
+  `;
+}
+function removeMuscleFromDay(dayKey, muscle){
+  confirmAction('Remover grupo muscular', `Remover "${muscleInfo(muscle).label}" e todos os exercícios adicionados a ele neste dia?`, ()=>{
+    const data = state.workoutWeek[dayKey];
+    data.muscles = data.muscles.filter(m=>m.muscle!==muscle);
+    showToast('Grupo muscular removido.');
+    render();
+  });
+}
+
+/* ---------------- Escolher músculo para adicionar ao dia ---------------- */
+function renderAddMuscle(main, params){
+  const day = DAYS.find(d=>d.key===params.day);
+  setHeader('Adicionar grupo', day.label);
+  const dayData = state.workoutWeek[day.key];
+  const already = new Set(dayData.muscles.map(m=>m.muscle));
+
+  main.innerHTML = `
+    <div class="hint-box">Escolha a cadeia muscular que você quer treinar em ${day.label.toLowerCase()}.</div>
+    ${MUSCLES.map(m=>{
+      const added = already.has(m.key);
+      return `<button class="list-item card-tap" style="width:100%;text-align:left;${added?'opacity:.45;':''}" ${added?'disabled':''} onclick="addMuscleToDay('${day.key}','${m.key}')">
+        <div class="badge" style="background:${m.color};">${m.label.slice(0,2).toUpperCase()}</div>
+        <div class="flex1">
+          <div class="title-sm">${m.label}</div>
+          <div class="sub-xs">${added?'Já adicionado a este dia':'Toque para adicionar'}</div>
+        </div>
+      </button>`;
+    }).join('')}
+  `;
+}
+function addMuscleToDay(dayKey, muscle){
+  const data = state.workoutWeek[dayKey];
+  if(data.muscles.find(m=>m.muscle===muscle)){ showToast('Esse grupo já está no dia.'); return; }
+  data.muscles.push({muscle, exercises:[]});
+  showToast(muscleInfo(muscle).label+' adicionado!');
+  navigate('workout-muscle',{day:dayKey,muscle}, true);
+}
+
+/* ---------------- Exercícios de um músculo dentro de um dia ---------------- */
+function renderMuscleExercises(main, params){
+  const {day, muscle} = params;
+  const dayInfo = DAYS.find(d=>d.key===day);
+  const info = muscleInfo(muscle);
+  const dayData = state.workoutWeek[day];
+  const mData = dayData.muscles.find(m=>m.muscle===muscle);
+  setHeader(info.label, dayInfo.label);
+
+  const fab = document.getElementById('fabBtn');
+  fab.style.display='flex';
+  fab.onclick = ()=>navigate('workout-pick-exercise',{day,muscle});
+
+  if(!mData){ navigate('workout-day',{day},true); return; }
+
+  main.innerHTML = `
+    ${mData.exercises.length===0? `
+      <div class="empty-state">
+        <div class="em-title">Nenhum exercício ainda</div>
+        <div class="em-sub">Toque em + para escolher um exercício da biblioteca ou criar um novo.</div>
+      </div>
+    ` : mData.exercises.map((ex,idx)=>{
+      const full = state.exerciseLibrary.find(e=>e.id===ex.exerciseId);
+      if(!full) return '';
+      return `<div class="list-item card-tap" onclick="navigate('workout-exercise-detail',{day:'${day}',muscle:'${muscle}',exerciseId:'${full.id}'})">
+        <div class="badge" style="background:${info.color};font-size:16px;">${idx+1}</div>
+        <div class="flex1">
+          <div class="title-sm">${full.name}</div>
+          <div class="sub-xs">${full.videoUrl? '🎬 Vídeo anexado' : 'Sem vídeo anexado'}</div>
+        </div>
+        <button class="icon-btn danger" onclick="event.stopPropagation();removeExerciseFromDay('${day}','${muscle}','${full.id}')">✕</button>
+      </div>`;
+    }).join('')}
+    <button class="btn btn-secondary btn-block" style="margin-top:8px;" onclick="navigate('workout-pick-exercise',{day:'${day}',muscle:'${muscle}'})">+ Adicionar exercício</button>
+  `;
+}
+function removeExerciseFromDay(day, muscle, exerciseId){
+  const mData = state.workoutWeek[day].muscles.find(m=>m.muscle===muscle);
+  mData.exercises = mData.exercises.filter(e=>e.exerciseId!==exerciseId);
+  showToast('Exercício removido do dia.');
+  render();
+}
+
+/* ---------------- Escolher exercício (da biblioteca ou novo) ---------------- */
+function renderPickExercise(main, params){
+  const {day, muscle} = params;
+  const info = muscleInfo(muscle);
+  setHeader('Escolher exercício', info.label);
+
+  const dayData = state.workoutWeek[day].muscles.find(m=>m.muscle===muscle);
+  const alreadyIds = new Set(dayData.exercises.map(e=>e.exerciseId));
+  const options = state.exerciseLibrary.filter(e=>e.muscle===muscle);
+
+  main.innerHTML = `
+    <button class="btn btn-primary btn-block" onclick="navigate('workout-new-exercise',{day:'${day}',muscle:'${muscle}'})">+ Criar novo exercício de ${info.label}</button>
+    <div class="section-label">Exercícios de ${info.label} na biblioteca</div>
+    ${options.length===0? `<div class="empty-state"><div class="em-sub">Nenhum exercício cadastrado para este grupo ainda.</div></div>` :
+    options.map(ex=>{
+      const added = alreadyIds.has(ex.id);
+      return `<button class="list-item card-tap" style="width:100%;text-align:left;${added?'opacity:.45;':''}" ${added?'disabled':''} onclick="addExerciseToDay('${day}','${muscle}','${ex.id}')">
+        <div class="badge" style="background:${info.color};">${ex.videoUrl?'🎬':'💪'}</div>
+        <div class="flex1">
+          <div class="title-sm">${ex.name}</div>
+          <div class="sub-xs">${added?'Já está neste dia':(ex.custom?'Exercício personalizado':'Exercício padrão')}</div>
+        </div>
+      </button>`;
+    }).join('')}
+  `;
+}
+function addExerciseToDay(day, muscle, exerciseId){
+  const mData = state.workoutWeek[day].muscles.find(m=>m.muscle===muscle);
+  if(mData.exercises.find(e=>e.exerciseId===exerciseId)){ showToast('Já adicionado.'); return; }
+  mData.exercises.push({id:uid(), exerciseId});
+  showToast('Exercício adicionado ao dia!');
+  navigate('workout-muscle',{day,muscle}, true);
+}
+
+/* ---------------- Criar novo exercício ---------------- */
+function renderNewExercise(main, params){
+  const {day, muscle} = params;
+  setHeader('Novo exercício', muscle ? muscleInfo(muscle).label : 'Biblioteca');
+
+  main.innerHTML = `
+    <div class="field">
+      <label>Nome do exercício</label>
+      <input type="text" id="newExName" placeholder="Ex: Supino declinado com halteres">
+    </div>
+    <div class="field">
+      <label>Músculo trabalhado</label>
+      <select id="newExMuscle">
+        ${MUSCLES.map(m=>`<option value="${m.key}" ${m.key===muscle?'selected':''}>${m.label}</option>`).join('')}
+      </select>
+    </div>
+    <div class="field">
+      <label>Vídeo da execução correta (opcional)</label>
+      <div class="field-file" onclick="document.getElementById('newExVideo').click()">
+        <div class="fl-label">🎬 Toque para escolher um arquivo .mp4 ou .mp3 do dispositivo</div>
+        <div class="fl-name" id="newExVideoName"></div>
+        <input type="file" id="newExVideo" accept="video/mp4,video/*,audio/mp3,audio/*">
+      </div>
+    </div>
+    <button class="btn btn-primary btn-block" onclick="saveNewExercise('${day||''}','${muscle||''}')">Salvar exercício</button>
+    <button class="btn btn-secondary" onclick="goBack()">Cancelar</button>
+  `;
+
+  document.getElementById('newExVideo').addEventListener('change', (e)=>{
+    const f = e.target.files[0];
+    document.getElementById('newExVideoName').textContent = f ? ('Selecionado: '+f.name) : '';
+  });
+}
+function saveNewExercise(day, muscle){
+  const name = document.getElementById('newExName').value.trim();
+  const selMuscle = document.getElementById('newExMuscle').value;
+  const fileInput = document.getElementById('newExVideo');
+  const file = fileInput.files[0];
+
+  if(!name){ showToast('Digite o nome do exercício.'); return; }
+
+  const newEx = {
+    id:uid(), name, muscle:selMuscle,
+    videoUrl: file ? URL.createObjectURL(file) : null,
+    videoKind: file ? (file.type.startsWith('audio')? 'audio':'video') : null,
+    custom:true
+  };
+  state.exerciseLibrary.push(newEx);
+  showToast('Exercício criado!');
+
+  if(day && selMuscle){
+    let mData = state.workoutWeek[day].muscles.find(m=>m.muscle===selMuscle);
+    if(!mData){ mData = {muscle:selMuscle, exercises:[]}; state.workoutWeek[day].muscles.push(mData); }
+    mData.exercises.push({id:uid(), exerciseId:newEx.id});
+    navigate('workout-muscle',{day,muscle:selMuscle}, true);
+  } else {
+    navigate('library', {}, true);
+  }
+}
+
+/* ---------------- Detalhe do exercício (dentro do dia) ---------------- */
+function renderExerciseDetail(main, params){
+  const {day, muscle, exerciseId} = params;
+  const ex = state.exerciseLibrary.find(e=>e.id===exerciseId);
+  if(!ex){ navigate('workout-day',{day},true); return; }
+  setHeader(ex.name, muscleInfo(ex.muscle).label);
+
+  main.innerHTML = `
+    <div class="card">
+      ${ex.videoUrl ? (ex.videoKind==='audio' ?
+        `<audio controls src="${ex.videoUrl}"></audio>` :
+        `<video controls src="${ex.videoUrl}"></video>`)
+        : `<div class="empty-state"><div class="em-sub">Nenhum vídeo anexado a este exercício.</div></div>`}
+    </div>
+    <div class="field">
+      <label>Anexar / trocar vídeo (arquivo do dispositivo)</label>
+      <div class="field-file" onclick="document.getElementById('attachVideo').click()">
+        <div class="fl-label">🎬 Toque para escolher .mp4 ou .mp3</div>
+        <div class="fl-name" id="attachVideoName"></div>
+        <input type="file" id="attachVideo" accept="video/mp4,video/*,audio/mp3,audio/*">
+      </div>
+    </div>
+    ${day ? `<button class="btn btn-secondary btn-block" onclick="navigate('workout-muscle',{day:'${day}',muscle:'${muscle}'},true)">Voltar aos exercícios do dia</button>` : ''}
+    <button class="btn btn-danger" onclick="deleteExerciseCompletely('${ex.id}')">Excluir exercício da biblioteca</button>
+  `;
+
+  document.getElementById('attachVideo').addEventListener('change',(e)=>{
+    const f = e.target.files[0];
+    if(!f) return;
+    ex.videoUrl = URL.createObjectURL(f);
+    ex.videoKind = f.type.startsWith('audio') ? 'audio' : 'video';
+    showToast('Vídeo anexado!');
+    render();
+  });
+}
+function deleteExerciseCompletely(exerciseId){
+  confirmAction('Excluir exercício', 'Isso remove o exercício da biblioteca e de todos os dias que o usam. Não pode ser desfeito.', ()=>{
+    state.exerciseLibrary = state.exerciseLibrary.filter(e=>e.id!==exerciseId);
+    DAYS.forEach(d=>{
+      state.workoutWeek[d.key].muscles.forEach(m=>{
+        m.exercises = m.exercises.filter(e=>e.exerciseId!==exerciseId);
+      });
+    });
+    showToast('Exercício excluído.');
+    navigate('library', {}, true);
+  });
+}
+
+/* ---------------- Biblioteca geral de exercícios ---------------- */
+function renderLibrary(main){
+  setHeader('Biblioteca', state.exerciseLibrary.length+' exercícios');
+  const fab = document.getElementById('fabBtn');
+  fab.style.display='flex';
+  fab.onclick = ()=>navigate('workout-new-exercise',{});
+
+  main.innerHTML = MUSCLES.map(m=>{
+    const list = state.exerciseLibrary.filter(e=>e.muscle===m.key);
+    if(list.length===0) return '';
+    return `<div class="section-label">${m.label}</div>` + list.map(ex=>`
+      <div class="list-item card-tap" onclick="navigate('workout-exercise-detail',{day:'',muscle:'${m.key}',exerciseId:'${ex.id}'})">
+        <div class="badge" style="background:${m.color};">${ex.videoUrl?'🎬':'💪'}</div>
+        <div class="flex1">
+          <div class="title-sm">${ex.name}</div>
+          <div class="sub-xs">${ex.custom?'Personalizado':'Padrão do app'}</div>
+        </div>
+        <div style="color:var(--text-faint);">›</div>
+      </div>`).join('');
+  }).join('') || `<div class="empty-state"><div class="em-sub">Nenhum exercício cadastrado.</div></div>`;
+}
+
+/* =========================================================================
+   DIETA — Semana
+   ========================================================================= */
+function renderDietWeek(main){
+  setHeader('Dieta','Escolha um dia da semana');
+  document.getElementById('notifBtn').style.display='flex';
+  main.innerHTML = `
+    <div class="day-grid">
+      ${DAYS.map(d=>{
+        const data = state.dietWeek[d.key];
+        return `<button class="day-plate ${data.meals.length>0?'has-data':''}" onclick="navigate('diet-day',{day:'${d.key}'})">
+          <span class="dow">${d.short}</span>
+          <span class="cnt">${data.meals.length>0? data.meals.length+' ref.' : '—'}</span>
+        </button>`;
+      }).join('')}
+    </div>
+    <div class="section-label">Resumo</div>
+    ${DAYS.filter(d=>state.dietWeek[d.key].meals.length>0).map(d=>{
+      const data = state.dietWeek[d.key];
+      return `<div class="card card-tap" onclick="navigate('diet-day',{day:'${d.key}'})">
+        <div class="row-between">
+          <div class="title-sm">${d.label}</div>
+          <div style="color:var(--text-faint);">›</div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;">
+          ${data.meals.map(m=>`<span class="chip">${m.name} ${m.time?('· '+m.time):''}</span>`).join('')}
+        </div>
+      </div>`;
+    }).join('') || `<div class="empty-state"><div class="em-title">Nenhuma refeição ainda</div><div class="em-sub">Toque em um dia acima para montar sua dieta.</div></div>`}
+  `;
+}
+
+/* ---------------- Dia de dieta ---------------- */
+function renderDietDay(main, params){
+  const day = DAYS.find(d=>d.key===params.day) || DAYS[0];
+  const data = state.dietWeek[day.key];
+  setHeader(day.label, 'Refeições do dia');
+
+  const fab = document.getElementById('fabBtn');
+  fab.style.display='flex';
+  fab.onclick = ()=>navigate('diet-add-meal',{day:day.key});
+
+  const sorted = [...data.meals].sort((a,b)=>(a.time||'99:99').localeCompare(b.time||'99:99'));
+
+  main.innerHTML = `
+    ${data.meals.length===0? `
+      <div class="empty-state">
+        <div class="em-title">Nenhuma refeição</div>
+        <div class="em-sub">Toque no + para adicionar uma refeição a este dia.</div>
+      </div>` :
+    sorted.map(meal=>{
+      const totals = mealTotals(meal);
+      return `<div class="list-item card-tap" onclick="navigate('diet-meal',{day:'${day.key}',mealId:'${meal.id}'})">
+        <div class="badge" style="background:var(--orange);">${meal.time?meal.time.slice(0,2):'--'}</div>
+        <div class="flex1">
+          <div class="row-between">
+            <div class="title-sm">${meal.name}</div>
+            <div class="sub-xs mono">${meal.time||'sem horário'}</div>
+          </div>
+          <div class="sub-xs">${meal.foods.length} item${meal.foods.length===1?'':'s'} · ${totals.kcal.toFixed(0)} kcal ${meal.notify?'· 🔔':''}</div>
+        </div>
+        <button class="icon-btn danger" onclick="event.stopPropagation();removeMeal('${day.key}','${meal.id}')">✕</button>
+      </div>`;
+    }).join('')}
+    <button class="btn btn-secondary btn-block" style="margin-top:8px;" onclick="navigate('diet-add-meal',{day:'${day.key}'})">+ Adicionar refeição</button>
+  `;
+}
+function removeMeal(day, mealId){
+  confirmAction('Remover refeição','Isso remove a refeição e todos os alimentos dela.', ()=>{
+    state.dietWeek[day].meals = state.dietWeek[day].meals.filter(m=>m.id!==mealId);
+    showToast('Refeição removida.');
+    render();
+  });
+}
+function mealTotals(meal){
+  return meal.foods.reduce((acc,f)=>{
+    const factor = f.grams/100;
+    acc.protein += f.protein*factor;
+    acc.carbs += f.carbs*factor;
+    acc.fat += f.fat*factor;
+    acc.kcal += (f.protein*factor*4)+(f.carbs*factor*4)+(f.fat*factor*9);
+    return acc;
+  },{protein:0,carbs:0,fat:0,kcal:0});
+}
+
+/* ---------------- Adicionar refeição ---------------- */
+function renderAddMeal(main, params){
+  const {day} = params;
+  const dayInfo = DAYS.find(d=>d.key===day);
+  setHeader('Nova refeição', dayInfo.label);
+
+  main.innerHTML = `
+    <div class="section-label">Sugestões</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;">
+      ${MEAL_PRESETS.map(p=>`<button class="chip" style="cursor:pointer;" onclick="document.getElementById('mealName').value='${p}'">${p}</button>`).join('')}
+    </div>
+    <div class="field">
+      <label>Nome da refeição</label>
+      <input type="text" id="mealName" placeholder="Ex: Almoço">
+    </div>
+    <div class="field">
+      <label>Horário</label>
+      <input type="time" id="mealTime">
+    </div>
+    <div class="field">
+      <label class="row-between" style="margin-bottom:0;">
+        <span>Lembrar por notificação neste horário</span>
+      </label>
+      <div class="seg" style="margin-top:8px;">
+        <button type="button" class="active" id="notifYes" onclick="setNotifChoice(true)">Sim</button>
+        <button type="button" id="notifNo" onclick="setNotifChoice(false)">Não</button>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-block" onclick="saveMeal('${day}')">Salvar refeição</button>
+    <button class="btn btn-secondary" onclick="goBack()">Cancelar</button>
+  `;
+}
+let _notifChoice = true;
+function setNotifChoice(v){
+  _notifChoice = v;
+  document.getElementById('notifYes').classList.toggle('active', v);
+  document.getElementById('notifNo').classList.toggle('active', !v);
+}
+function saveMeal(day){
+  const name = document.getElementById('mealName').value.trim();
+  const time = document.getElementById('mealTime').value;
+  if(!name){ showToast('Digite o nome da refeição.'); return; }
+  const meal = {id:uid(), name, time, notify: _notifChoice && !!time, foods:[]};
+  state.dietWeek[day].meals.push(meal);
+  if(meal.notify) ensureNotifPermission();
+  _notifChoice = true;
+  showToast('Refeição adicionada!');
+  navigate('diet-meal',{day,mealId:meal.id}, true);
+}
+
+/* ---------------- Detalhe da refeição (alimentos) ---------------- */
+function renderMealDetail(main, params){
+  const {day, mealId} = params;
+  const dayInfo = DAYS.find(d=>d.key===day);
+  const meal = state.dietWeek[day].meals.find(m=>m.id===mealId);
+  if(!meal){ navigate('diet-day',{day},true); return; }
+  setHeader(meal.name, dayInfo.label+(meal.time?(' · '+meal.time):''));
+
+  const fab = document.getElementById('fabBtn');
+  fab.style.display='flex';
+  fab.onclick = ()=>navigate('diet-add-food',{day,mealId});
+
+  const totals = mealTotals(meal);
+  const maxMacro = Math.max(totals.protein, totals.carbs, totals.fat, 1);
+
+  main.innerHTML = `
+    <div class="card">
+      <div class="row-between">
+        <div class="sub-xs">Horário</div>
+        <div class="mono" style="font-weight:600;">${meal.time||'não definido'}</div>
+      </div>
+      <div class="row-between" style="margin-top:6px;">
+        <div class="sub-xs">Lembrete</div>
+        <button class="chip" style="cursor:pointer;${meal.notify?'color:var(--orange);border-color:var(--orange);':''}" onclick="toggleMealNotify('${day}','${mealId}')">${meal.notify?'🔔 Ativado':'🔕 Desativado'}</button>
+      </div>
+      <div class="row-between" style="margin-top:14px;">
+        <div class="sub-xs">Total estimado</div>
+        <div class="mono" style="font-weight:700;">${totals.kcal.toFixed(0)} kcal</div>
+      </div>
+      <div class="macro-bar">
+        <span style="width:${totals.protein/maxMacro*33.3}%;background:#FF7A50;"></span>
+        <span style="width:${totals.carbs/maxMacro*33.3}%;background:#C8FF4D;"></span>
+        <span style="width:${totals.fat/maxMacro*33.3}%;background:#FFD24D;"></span>
+      </div>
+      <div class="grid3" style="margin-top:10px;">
+        <div><div class="sub-xs">Proteína</div><div class="mono" style="font-weight:600;">${totals.protein.toFixed(1)}g</div></div>
+        <div><div class="sub-xs">Carboidrato</div><div class="mono" style="font-weight:600;">${totals.carbs.toFixed(1)}g</div></div>
+        <div><div class="sub-xs">Gordura</div><div class="mono" style="font-weight:600;">${totals.fat.toFixed(1)}g</div></div>
+      </div>
+    </div>
+
+    <div class="section-label">Alimentos</div>
+    ${meal.foods.length===0? `<div class="empty-state"><div class="em-sub">Nenhum alimento adicionado. Toque em + para começar.</div></div>` :
+    meal.foods.map(f=>{
+      const c = catInfo(f.category);
+      const factor = f.grams/100;
+      const kcal = (f.protein*factor*4)+(f.carbs*factor*4)+(f.fat*factor*9);
+      return `<div class="list-item">
+        <div class="badge" style="background:${c.color};font-size:11px;">${c.label.slice(0,3).toUpperCase()}</div>
+        <div class="flex1">
+          <div class="title-sm">${f.name}</div>
+          <div class="sub-xs mono">${f.grams}g · ${kcal.toFixed(0)} kcal · P${f.protein.toFixed(1)} C${f.carbs.toFixed(1)} G${f.fat.toFixed(1)}</div>
+        </div>
+        <button class="icon-btn danger" onclick="removeFoodFromMeal('${day}','${mealId}','${f.id}')">✕</button>
+      </div>`;
+    }).join('')}
+    <button class="btn btn-secondary btn-block" style="margin-top:8px;" onclick="navigate('diet-add-food',{day:'${day}',mealId:'${mealId}'})">+ Adicionar alimento</button>
+  `;
+}
+function toggleMealNotify(day, mealId){
+  const meal = state.dietWeek[day].meals.find(m=>m.id===mealId);
+  if(!meal.time){ showToast('Defina um horário para ativar o lembrete.'); return; }
+  meal.notify = !meal.notify;
+  if(meal.notify) ensureNotifPermission();
+  render();
+}
+function removeFoodFromMeal(day, mealId, foodEntryId){
+  const meal = state.dietWeek[day].meals.find(m=>m.id===mealId);
+  meal.foods = meal.foods.filter(f=>f.id!==foodEntryId);
+  showToast('Alimento removido.');
+  render();
+}
+
+/* ---------------- Adicionar alimento à refeição ---------------- */
+function renderAddFood(main, params){
+  const {day, mealId} = params;
+  const meal = state.dietWeek[day].meals.find(m=>m.id===mealId);
+  setHeader('Adicionar alimento', meal.name);
+
+  main.innerHTML = `
+    <button class="btn btn-primary btn-block" onclick="navigate('diet-add-food-custom',{day:'${day}',mealId:'${mealId}'})" style="display:none;"></button>
+    <div class="field">
+      <label>Buscar na biblioteca</label>
+      <input type="text" id="foodSearch" placeholder="Digite o nome do alimento..." oninput="filterFoodPicker(this.value)">
+    </div>
+    <div id="foodPickerList"></div>
+    <div class="section-label">Ou cadastre um alimento novo</div>
+    <button class="btn btn-secondary btn-block" onclick="renderCustomFoodForm('${day}','${mealId}')">+ Alimento personalizado</button>
+    <div id="customFoodFormWrap"></div>
+  `;
+  filterFoodPicker('');
+}
+function filterFoodPicker(query){
+  const list = document.getElementById('foodPickerList');
+  if(!list) return;
+  const q = query.trim().toLowerCase();
+  const items = state.foodLibrary.filter(f=>f.name.toLowerCase().includes(q));
+  list.innerHTML = items.map(f=>{
+    const c = catInfo(f.category);
+    return `<button class="list-item card-tap" style="width:100%;text-align:left;" onclick="openGramsPicker('${f.id}')">
+      <div class="badge" style="background:${c.color};font-size:11px;">${c.label.slice(0,3).toUpperCase()}</div>
+      <div class="flex1">
+        <div class="title-sm">${f.name}</div>
+        <div class="sub-xs mono">P${f.protein}/C${f.carbs}/G${f.fat} por 100g</div>
+      </div>
+    </button>`;
+  }).join('') || `<div class="empty-state"><div class="em-sub">Nenhum alimento encontrado.</div></div>`;
+}
+function openGramsPicker(foodId){
+  const food = state.foodLibrary.find(f=>f.id===foodId);
+  openModal(`
+    <div class="modal-title">${food.name}</div>
+    <div class="field">
+      <label>Quantidade (gramas)</label>
+      <input type="number" id="gramsInput" value="100" min="1" step="1">
+    </div>
+    <div class="hint-box">Proteína ${food.protein}g · Carboidrato ${food.carbs}g · Gordura ${food.fat}g — valores por 100g</div>
+    <button class="btn btn-primary btn-block" onclick="confirmAddFood('${food.id}')">Adicionar à refeição</button>
+    <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+  `);
+}
+let _pendingFoodTarget = null;
+function confirmAddFood(foodId){
+  const grams = parseFloat(document.getElementById('gramsInput').value) || 100;
+  const food = state.foodLibrary.find(f=>f.id===foodId);
+  const {day, mealId} = current().params;
+  const meal = state.dietWeek[day].meals.find(m=>m.id===mealId);
+  meal.foods.push({
+    id:uid(), foodId:food.id, name:food.name, grams,
+    protein:food.protein, carbs:food.carbs, fat:food.fat, category:food.category
+  });
+  closeModal();
+  showToast(food.name+' adicionado!');
+  render();
+}
+function renderCustomFoodForm(day, mealId){
+  const wrap = document.getElementById('customFoodFormWrap');
+  wrap.innerHTML = `
+    <div class="card">
+      <div class="field">
+        <label>Nome do alimento</label>
+        <input type="text" id="cfName" placeholder="Ex: Tapioca com queijo">
+      </div>
+      <div class="field">
+        <label>Quantidade (gramas)</label>
+        <input type="number" id="cfGrams" value="100" min="1" step="1">
+      </div>
+      <div class="field">
+        <label>Categoria</label>
+        <select id="cfCategory">${FOOD_CATEGORIES.map(c=>`<option value="${c.key}">${c.label}</option>`).join('')}</select>
+      </div>
+      <div class="grid3">
+        <div class="field"><label>Proteína (g/100g)</label><input type="number" id="cfProtein" value="0" min="0" step="0.1"></div>
+        <div class="field"><label>Carboidr. (g/100g)</label><input type="number" id="cfCarbs" value="0" min="0" step="0.1"></div>
+        <div class="field"><label>Gordura (g/100g)</label><input type="number" id="cfFat" value="0" min="0" step="0.1"></div>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="saveCustomFood('${day}','${mealId}')">Salvar e adicionar</button>
+    </div>
+  `;
+  wrap.scrollIntoView({behavior:'smooth', block:'end'});
+}
+function saveCustomFood(day, mealId){
+  const name = document.getElementById('cfName').value.trim();
+  if(!name){ showToast('Digite o nome do alimento.'); return; }
+  const grams = parseFloat(document.getElementById('cfGrams').value)||100;
+  const category = document.getElementById('cfCategory').value;
+  const protein = parseFloat(document.getElementById('cfProtein').value)||0;
+  const carbs = parseFloat(document.getElementById('cfCarbs').value)||0;
+  const fat = parseFloat(document.getElementById('cfFat').value)||0;
+
+  const newFood = {id:uid(), name, category, protein, carbs, fat, custom:true};
+  state.foodLibrary.push(newFood);
+
+  const meal = state.dietWeek[day].meals.find(m=>m.id===mealId);
+  meal.foods.push({id:uid(), foodId:newFood.id, name, grams, protein, carbs, fat, category});
+
+  showToast('Alimento criado e adicionado!');
+  navigate('diet-meal',{day,mealId}, true);
+}
+
+/* ---------------- Biblioteca de alimentos ---------------- */
+function renderFoodLibrary(main){
+  setHeader('Alimentos', state.foodLibrary.length+' cadastrados');
+  main.innerHTML = `
+    <div class="field">
+      <input type="text" id="libFoodSearch" placeholder="Buscar alimento..." oninput="filterFoodLibraryView(this.value)">
+    </div>
+    <div id="libFoodList"></div>
+  `;
+  filterFoodLibraryView('');
+}
+function filterFoodLibraryView(q){
+  const list = document.getElementById('libFoodList');
+  const query = q.trim().toLowerCase();
+  const items = state.foodLibrary.filter(f=>f.name.toLowerCase().includes(query));
+  list.innerHTML = FOOD_CATEGORIES.map(c=>{
+    const catItems = items.filter(f=>f.category===c.key);
+    if(catItems.length===0) return '';
+    return `<div class="section-label">${c.label}</div>` + catItems.map(f=>`
+      <div class="list-item card-tap" onclick="navigate('diet-food-detail',{foodId:'${f.id}'})">
+        <div class="badge" style="background:${c.color};font-size:11px;">${c.label.slice(0,3).toUpperCase()}</div>
+        <div class="flex1">
+          <div class="title-sm">${f.name}</div>
+          <div class="sub-xs mono">P${f.protein}/C${f.carbs}/G${f.fat} por 100g</div>
+        </div>
+        <div style="color:var(--text-faint);">›</div>
+      </div>`).join('');
+  }).join('') || `<div class="empty-state"><div class="em-sub">Nenhum alimento encontrado.</div></div>`;
+}
+function renderFoodDetail(main, params){
+  const food = state.foodLibrary.find(f=>f.id===params.foodId);
+  if(!food){ navigate('food-library',{},true); return; }
+  const c = catInfo(food.category);
+  setHeader(food.name, c.label);
+  main.innerHTML = `
+    <div class="card">
+      <div class="grid3">
+        <div><div class="sub-xs">Proteína</div><div class="mono" style="font-weight:700;">${food.protein}g</div></div>
+        <div><div class="sub-xs">Carboidrato</div><div class="mono" style="font-weight:700;">${food.carbs}g</div></div>
+        <div><div class="sub-xs">Gordura</div><div class="mono" style="font-weight:700;">${food.fat}g</div></div>
+      </div>
+      <div class="sub-xs" style="margin-top:10px;">valores por 100g</div>
+    </div>
+    <button class="btn btn-danger" onclick="deleteFoodCompletely('${food.id}')">Excluir alimento da biblioteca</button>
+  `;
+}
+function deleteFoodCompletely(foodId){
+  confirmAction('Excluir alimento','Isso remove o alimento da biblioteca. Refeições que já usam esse alimento mantêm os valores registrados.', ()=>{
+    state.foodLibrary = state.foodLibrary.filter(f=>f.id!==foodId);
+    showToast('Alimento excluído.');
+    navigate('food-library', {}, true);
+  });
+}
+
+/* =========================================================================
+   NOTIFICAÇÕES
+   ========================================================================= */
+function toggleNotifPanel(){ navigate('notif-settings'); }
+
+function renderNotifSettings(main){
+  setHeader('Notificações','Lembretes de refeição');
+  const perm = (typeof Notification!=='undefined') ? Notification.permission : 'unsupported';
+  const scheduled = [];
+  DAYS.forEach(d=>{
+    state.dietWeek[d.key].meals.forEach(m=>{
+      if(m.notify && m.time) scheduled.push({day:d.label, name:m.name, time:m.time});
+    });
+  });
+  scheduled.sort((a,b)=>a.time.localeCompare(b.time));
+
+  main.innerHTML = `
+    <div class="hint-box">
+      As notificações funcionam enquanto esta aba do navegador estiver aberta. É um lembrete local — não precisa de internet, mas precisa que o app esteja aberto em segundo plano.
+    </div>
+    <div class="card">
+      <div class="row-between">
+        <div class="title-sm">Permissão do navegador</div>
+        <span class="chip" style="${perm==='granted'?'color:var(--lime);border-color:var(--lime);':''}">${
+          perm==='granted' ? 'Permitido' : perm==='denied' ? 'Bloqueado' : perm==='unsupported' ? 'Indisponível' : 'Não solicitado'
+        }</span>
+      </div>
+      ${perm!=='granted' && perm!=='unsupported' ? `<button class="btn btn-primary btn-block" style="margin-top:14px;" onclick="ensureNotifPermission(true)">Ativar notificações</button>` : ''}
+      ${perm==='denied' ? `<div class="sub-xs" style="margin-top:8px;">Você bloqueou as notificações. Ative pelas configurações do navegador para este site.</div>` : ''}
+    </div>
+
+    <div class="section-label">Lembretes agendados</div>
+    ${scheduled.length===0 ? `<div class="empty-state"><div class="em-sub">Nenhum lembrete ativo. Ative o sino ao editar uma refeição com horário definido.</div></div>` :
+    scheduled.map(s=>`<div class="list-item">
+      <div class="badge" style="background:var(--orange);">🔔</div>
+      <div class="flex1">
+        <div class="title-sm">${s.name}</div>
+        <div class="sub-xs">${s.day} · ${s.time}</div>
+      </div>
+    </div>`).join('')}
+  `;
+}
+
+function ensureNotifPermission(showFeedback){
+  if(typeof Notification==='undefined'){
+    if(showFeedback) showToast('Este navegador não suporta notificações.');
+    return;
+  }
+  if(Notification.permission==='default'){
+    Notification.requestPermission().then(p=>{
+      state.notifPermission = p;
+      if(showFeedback) showToast(p==='granted' ? 'Notificações ativadas!' : 'Permissão não concedida.');
+      render();
+    });
+  } else if(showFeedback){
+    showToast(Notification.permission==='granted' ? 'Notificações já ativadas.' : 'Notificações bloqueadas nas configurações do navegador.');
+  }
+}
+
+/* Checa a cada 20s se algum horário de refeição bateu com o horário atual */
+function checkMealNotifications(){
+  if(typeof Notification==='undefined' || Notification.permission!=='granted') return;
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2,'0');
+  const mm = String(now.getMinutes()).padStart(2,'0');
+  const nowStr = `${hh}:${mm}`;
+  const dowIndex = now.getDay(); // 0=domingo
+  const dayKey = DAYS[dowIndex].key;
+
+  const meals = state.dietWeek[dayKey].meals;
+  meals.forEach(meal=>{
+    if(meal.notify && meal.time===nowStr){
+      const flagKey = dayKey+'-'+meal.id+'-'+nowStr;
+      if(!state.firedThisMinute[flagKey]){
+        state.firedThisMinute[flagKey] = true;
+        try{
+          new Notification('Hora da refeição: '+meal.name, {
+            body: 'Está na hora de '+meal.name.toLowerCase()+' ('+meal.time+').',
+            tag: flagKey,
+          });
+        }catch(e){}
+      }
+    }
+  });
+  // limpa flags antigas de vez em quando
+  if(Object.keys(state.firedThisMinute).length>200) state.firedThisMinute = {};
+}
+setInterval(checkMealNotifications, 20000);
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  });
+}
+
+/* =========================================================================
+   INIT
+   ========================================================================= */
+/* ---------------- FIREBASE ----------------
+   Cole aqui as chaves do SEU projeto Firebase (Console → Configurações do projeto → SDK do Firebase).
+   Sem isso preenchido, o login não vai funcionar. */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBbBi3eG9l9CMaswvv620owWIZj28nEjHA",
+  authDomain: "modofoco-app-ac4e0.firebaseapp.com",
+  projectId: "modofoco-app-ac4e0",
+  storageBucket: "modofoco-app-ac4e0.firebasestorage.app",
+  messagingSenderId: "704065763884",
+  appId: "1:704065763884:web:8ebc19937a68f1a7126f89"
+};
+firebase.initializeApp(FIREBASE_CONFIG);
+const auth = firebase.auth();
+const db = firebase.firestore();
+try{ db.enablePersistence({synchronizeTabs:true}); }catch(e){} // cache offline automático
+
+/* ---------------- AUTENTICAÇÃO ---------------- */
+function showAuthTab(tab){
+  document.getElementById('tabLoginBtn').classList.toggle('active', tab==='login');
+  document.getElementById('tabSignupBtn').classList.toggle('active', tab==='signup');
+  document.getElementById('loginForm').style.display = tab==='login' ? 'block' : 'none';
+  document.getElementById('signupForm').style.display = tab==='signup' ? 'block' : 'none';
+}
+
+function traduzErroFirebase(err){
+  const map = {
+    'auth/email-already-in-use':'Já existe uma conta com esse e-mail.',
+    'auth/invalid-email':'Digite um e-mail válido.',
+    'auth/weak-password':'A senha precisa ter no mínimo 6 caracteres.',
+    'auth/user-not-found':'E-mail ou senha incorretos.',
+    'auth/wrong-password':'E-mail ou senha incorretos.',
+    'auth/invalid-credential':'E-mail ou senha incorretos.',
+    'auth/too-many-requests':'Muitas tentativas. Aguarde um pouco e tente de novo.',
+    'auth/network-request-failed':'Sem conexão com a internet. Verifique sua rede.',
+  };
+  return map[err.code] || ('Erro: ' + err.message);
+}
+
+function doSignup(){
+  const nome = document.getElementById('suNome').value.trim();
+  const email = document.getElementById('suEmail').value.trim().toLowerCase();
+  const telefone = document.getElementById('suTelefone').value.trim();
+  const nascimento = document.getElementById('suNascimento').value;
+  const senha = document.getElementById('suSenha').value;
+  const senha2 = document.getElementById('suSenha2').value;
+  const errBox = document.getElementById('signupError');
+  errBox.textContent = '';
+
+  if(!nome || !email || !telefone || !nascimento || !senha){ errBox.textContent='Preencha todos os campos.'; return; }
+  if(!email.includes('@') || !email.includes('.')){ errBox.textContent='Digite um e-mail válido.'; return; }
+  if(senha.length < 6){ errBox.textContent='A senha precisa ter no mínimo 6 caracteres.'; return; }
+  if(senha !== senha2){ errBox.textContent='As senhas não coincidem.'; return; }
+
+  const btn = document.querySelector('#signupForm .btn-primary');
+  if(btn){ btn.disabled = true; btn.textContent = 'Criando conta...'; }
+
+  auth.createUserWithEmailAndPassword(email, senha)
+    .then((cred)=>{
+      return db.collection('modofoco-users').doc(cred.user.uid).set({
+        nome, email, telefone, nascimento,
+        workoutWeek: state.workoutWeek,
+        dietWeek: state.dietWeek,
+        exerciseLibrary: state.exerciseLibrary.map(e=>({...e, videoUrl:null, videoKind:null})),
+        foodLibrary: state.foodLibrary,
+      });
+    })
+    .then(()=> enterApp())
+    .catch((err)=>{
+      errBox.textContent = traduzErroFirebase(err);
+      if(btn){ btn.disabled = false; btn.textContent = 'Criar conta'; }
+    });
+}
+
+function doLogin(){
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const senha = document.getElementById('loginSenha').value;
+  const errBox = document.getElementById('loginError');
+  errBox.textContent = '';
+
+  const btn = document.querySelector('#loginForm .btn-primary');
+  if(btn){ btn.disabled = true; btn.textContent = 'Entrando...'; }
+
+  auth.signInWithEmailAndPassword(email, senha)
+    .then(()=> enterApp())
+    .catch((err)=>{
+      errBox.textContent = traduzErroFirebase(err);
+      if(btn){ btn.disabled = false; btn.textContent = 'Entrar'; }
+    });
+}
+
+function logout(){
+  saveToStorage().finally(()=>{
+    auth.signOut().then(()=> location.reload());
+  });
+}
+
+async function enterApp(){
+  await loadFromStorage();
+  document.getElementById('authScreen').style.display='none';
+  document.getElementById('app').style.display='flex';
+  render();
+}
+
+/* ---------------- INIT (login primeiro) ---------------- */
+document.getElementById('app').style.display='none';
+auth.onAuthStateChanged((user)=>{
+  if(user){
+    enterApp();
+  } else {
+    document.getElementById('authScreen').style.display='flex';
+  }
+});
+
+function saveToStorage(){
+  const user = auth.currentUser;
+  const data = {
+    workoutWeek: state.workoutWeek,
+    dietWeek: state.dietWeek,
+    exerciseLibrary: state.exerciseLibrary.map(e=>({...e, videoUrl:null, videoKind:null})),
+    foodLibrary: state.foodLibrary,
+  };
+  if(!user){
+    try{ localStorage.setItem('modofoco-data-convidado', JSON.stringify(data)); }catch(e){}
+    return Promise.resolve();
+  }
+  return db.collection('modofoco-users').doc(user.uid).set(data, {merge:true})
+    .catch((e)=>{
+      // sem internet: o Firestore guarda em fila local e sincroniza sozinho depois
+      console.warn('saveToStorage: será sincronizado quando voltar a conexão', e);
+    });
+}
+
+async function loadFromStorage(){
+  const user = auth.currentUser;
+  if(!user) return;
+  try{
+    const doc = await db.collection('modofoco-users').doc(user.uid).get();
+    if(doc.exists){
+      const data = doc.data();
+      if(data.workoutWeek) state.workoutWeek = data.workoutWeek;
+      if(data.dietWeek) state.dietWeek = data.dietWeek;
+      if(data.exerciseLibrary) state.exerciseLibrary = data.exerciseLibrary;
+      if(data.foodLibrary) state.foodLibrary = data.foodLibrary;
+    }
+  }catch(e){
+    console.warn('loadFromStorage: usando cache local se disponível', e);
+  }
+}
+</script>
+</body>
+</html>
