@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.github.nicolasirineu831_langoclss.twa",
+        "sha256_cert_fingerprints": ["9D:56:DC:3A:60:D8:F6:F6:8B:D7:90:40:71:2E:38:97:58:27:E0:8B:B9:D4:61:8C:CD:9B:02:AE:54:E0:67:B3"]
+      }
+    }]
