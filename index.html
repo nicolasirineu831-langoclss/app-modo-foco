@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
-<title>MODO FOCO — Treino & Dieta</title>
+<title>GYM FOCUS — Treino & Dieta</title>
 <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#14171A">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="MODO FOCO">
+<meta name="apple-mobile-web-app-title" content="GYM FOCUS">
 <link rel="apple-touch-icon" href="./icon-192.png">
 <link rel="icon" href="./icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -329,7 +329,7 @@ video,audio{width:100%;border-radius:10px;background:#000;display:block;}
 
 	<div id="authScreen">
   <div class="auth-wrap">
-    <div class="auth-logo">MODO FOCO</div>
+    <div class="auth-logo">GYM FOCUS</div>
     <div class="auth-sub">Treino & Dieta</div>
 
     <div class="seg" style="margin:24px 0 20px 0;">
@@ -388,7 +388,7 @@ video,audio{width:100%;border-radius:10px;background:#000;display:block;}
     <div class="topbar-inner">
       <button class="back-btn" id="backBtn" onclick="goBack()" style="display:none;">←</button>
       <div class="flex1">
-        <div class="topbar-title" id="pageTitle">MODO FOCO</div>
+        <div class="topbar-title" id="pageTitle">GYM FOCUS</div>
         <span class="topbar-sub" id="pageSub"></span>
       </div>
       <button class="icon-btn" id="notifBtn" onclick="toggleNotifPanel()" title="Notificações" style="display:none;">🔔</button>
@@ -399,7 +399,7 @@ video,audio{width:100%;border-radius:10px;background:#000;display:block;}
   <main id="main">
     <div id="pageContent"></div>
     <footer class="app-footer">
-      <p>MODO FOCO © 2026 — Treino & Dieta</p>
+      <p>GYM FOCUS © 2026 — Treino & Dieta</p>
 			<p>© 2026 Nicolas Almeida. Todos os direitos reservados.</p>
     </footer>
 	</main>
@@ -424,7 +424,7 @@ video,audio{width:100%;border-radius:10px;background:#000;display:block;}
 
 <script>
 /* =========================================================================
-   MODO FOCO — App de Treino & Dieta
+   GYM FOCUS — App de Treino & Dieta
    Armazenamento: em memória (dura enquanto a aba está aberta).
    Use "Início > Backup" para exportar/importar seus dados em um arquivo .json
    e não perder nada entre uma sessão e outra.
@@ -650,7 +650,7 @@ function setHeader(title, sub=''){
    HOME
    ========================================================================= */
 function renderHome(main){
-  setHeader('MODO FOCO','Treino & Dieta');
+  setHeader('GYM FOCUS','Treino & Dieta');
   document.getElementById('notifBtn').style.display='flex';
 
   const workoutDaysFilled = DAYS.filter(d=>state.workoutWeek[d.key].muscles.length>0).length;

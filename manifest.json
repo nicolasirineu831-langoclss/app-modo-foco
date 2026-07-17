@@ -1,6 +1,6 @@
 {
-  "name": "MODO FOCO — Treino & Dieta",
-  "short_name": "MODO FOCO",
+  "name": "GYM FOCUS — Treino & Dieta",
+  "short_name": "GYM FOCUS",
   "description": "Acompanhe seus treinos e sua dieta semanal.",
   "start_url": "./index.html",
   "scope": "./",
